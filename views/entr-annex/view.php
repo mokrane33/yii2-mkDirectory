@@ -4,13 +4,13 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Category */
+/* @var $model app\models\EntrAnnex */
 
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Categories'), 'url' => ['index']];
+$this->title = $model->id;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Entr Annexes'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="category-view">
+<div class="entr-annex-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -29,13 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'id_parent',
-            'name',
-            'status',
-            'image',
-            'description:ntext',
-            'meta_key:ntext',
-            'meta_description:ntext',
+            'id_ent',
         ],
     ]) ?>
 

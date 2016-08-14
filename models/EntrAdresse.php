@@ -59,4 +59,6 @@ class EntrAdresse extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Ville::className(), ['id' => 'ville']);
     }
+
+
 }

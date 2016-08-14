@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\CategorySearch */
+/* @var $model app\models\EntrAnnexSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="category-search">
+<div class="entr-annex-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -17,19 +17,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'id_parent') ?>
-
-    <?= $form->field($model, 'name') ?>
-
-    <?= $form->field($model, 'status') ?>
-
-    <?= $form->field($model, 'image') ?>
-
-    <?php // echo $form->field($model, 'description') ?>
-
-    <?php // echo $form->field($model, 'meta_key') ?>
-
-    <?php // echo $form->field($model, 'meta_description') ?>
+    <?= $form->field($model, 'id_ent') ?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>

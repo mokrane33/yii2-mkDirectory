@@ -51,4 +51,30 @@ class EntrAnnex extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Entreprise::className(), ['id' => 'id_ent']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEntrCont()
+    {
+        return $this->hasMany(EntrCont::className(), ['id_ent' => 'id'])->andFilterWhere(['type_ent'=>1]);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEntrAdresse()
+    {
+        return $this->hasMany(EntrAdresse::className(), ['id_ent' => 'id'])->andFilterWhere(['type_ent'=>1]);
+    }
+
+    public function beforedelete()
+    {
+
+        foreach($this->getEntrAdresse()->all() as $entradress)
+            $entradress->delete();
+        foreach($this->getEntrCont()->all() as $entcont)
+            $entcont->delete();
+
+        return parent::beforeDelete();
+    }
 }

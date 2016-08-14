@@ -26,11 +26,11 @@ use yii\widgets\ActiveForm;
             'id' => 'dynamic-form'
         ]
     ]);
-    var_dump((new Category())->getTree());
+//    var_dump((new Category())->getTree());
    $catlist=ArrayHelper::map((new Category())->getTree(),'id','name');
 //    (new Category())->gettreeArray();
 // $catlist=['aa'=>[1=>'111',2=>'2222']];
-    var_dump( $catlist);
+//    var_dump( $catlist);
     ?>
 
     <?= $form->field($model, 'raisonsociale')->textInput(['maxlength' => true]) ?>
@@ -97,7 +97,7 @@ use yii\widgets\ActiveForm;
         <div class="line line-dashed"></div>
     </div>
     <?php
-    //echo $this->render('entr_contact_form',['modelcontacts'=>$modelcontacts,'form'=>$form]);
+    echo $this->render('entr_contact_form',['modelcontacts'=>$modelcontacts,'form'=>$form]);
     ?>
 
     <!-- begin partner contact form-->

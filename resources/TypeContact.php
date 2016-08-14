@@ -13,8 +13,8 @@ class TypeContact
 {
     public $type=[
         '1' => 'Email',
-        '2' => 'Tél Mobile',
-        '3' => 'Tél Fixe',
+        '2' => 'TÃ©l Mobile',
+        '3' => 'TÃ©l Fixe',
     ];
 //    public function getStatus()
 //    {

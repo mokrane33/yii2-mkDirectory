@@ -145,4 +145,18 @@ class Entreprise extends Image
     {
         return $this->hasMany(EntrProduit::className(), ['id_ent' => 'id']);
     }
+
+
+    public function beforedelete()
+    {
+
+        foreach($this->getEntrAdresse()->all() as $entradress)
+           $entradress->delete();
+        foreach($this->getEntrCont()->all() as $entcont)
+            $entcont->delete();
+        foreach($this->getEntrAnnexes()->all() as $annex)
+            $annex->delete();
+
+        return parent::beforeDelete();
+    }
 }

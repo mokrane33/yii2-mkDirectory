@@ -1,5 +1,6 @@
 <?php
 
+use app\resources\TypeContact;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use wbraganca\dynamicform\DynamicFormWidget;
@@ -8,7 +9,9 @@ use wbraganca\dynamicform\DynamicFormWidget;
 /* @var $model app\models\EntrCont */
 /* @var $form yii\widgets\ActiveForm */
 ?>
+
 <?php
+$type = New TypeContact();
 DynamicFormWidget::begin([
     'widgetContainer' => 'dynamicform_contact', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
     'widgetBody' => '.container-items', // required: css class selector
@@ -23,6 +26,7 @@ DynamicFormWidget::begin([
         'type',
         'valeur',
     ],
+
 ]);
 ?>
     <div class="panel panel-default">
@@ -46,7 +50,7 @@ DynamicFormWidget::begin([
                             echo Html::activeHiddenInput($modelcontact, "[{$index}]id");
                         }
                         ?>
-                        <?= $form->field($modelcontact, "[{$index}]type")->textInput(['maxlength' => true]) ?>
+                        <?= $form->field($modelcontact, "[{$index}]type")->dropDownList($type->type) ?>
                         <div class="row">
                             <div class="col-sm-6">
                                 <?= $form->field($modelcontact, "[{$index}]valeur")->textInput(['maxlength' => true]) ?>
