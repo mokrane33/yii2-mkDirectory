@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="entreprise-index">
-<?php  Pjax::begin(); ?>
+
     <h1><?= Html::encode($this->title) ?></h1>
     <p>
         <?= Html::a(Yii::t('app', 'Create Entreprise'), ['create'], ['class' => 'btn btn-success']) ?>
@@ -36,6 +36,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
 
             ],
+            [
+                    'label' => 'Produits et services',
+                    'format' => 'html',
+                    'value' => function ($data) {
+                        return Html::a(FA::icon(FA::_PENCIL) ,Url::to(['/entr-produit/', 'id_ent' => $data->id]));
+                    }
+
+            ],
 
             'raisonsociale',
             // 'description_small:ntext',
@@ -44,5 +52,5 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
-<?php Pjax::end(); ?>
+
 </div>

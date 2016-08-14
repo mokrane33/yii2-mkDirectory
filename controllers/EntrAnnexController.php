@@ -66,6 +66,11 @@ class EntrAnnexController extends Controller
      */
     public function actionView($id)
     {
+        $params= Yii::$app->request->queryParams;
+        if(!array_key_exists('id_ent',$params))
+            return $this->redirect(['/entreprise']);
+        if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
+            return $this->redirect(['/entreprise']);
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -103,7 +108,7 @@ class EntrAnnexController extends Controller
             if (Yii::$app->request->isAjax) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 return ArrayHelper::merge(
-//                    ActiveForm::validateMultiple($modelcontacts),
+                    ActiveForm::validateMultiple($modelcontacts),
                     ActiveForm::validate($model),
                     ActiveForm::validate($modelAdress)
                 );
@@ -146,7 +151,7 @@ class EntrAnnexController extends Controller
                 {
                     $transaction->rollBack();
                 }
-                return $this->redirect(['view', 'id' => $model->id,'id_ent' => $model->id]);
+                return $this->redirect(['view', 'id' => $model->id,'id_ent' => $model->id_ent]);
             }
             else
             {
@@ -182,11 +187,8 @@ class EntrAnnexController extends Controller
         $model = $this->findModel($id);
         $modelcontacts=$model->getEntrCont()->all();
         $modelAdress=$model->getEntrAdresse()->one();
-        $params= Yii::$app->request->queryParams;
-        if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
-        if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+
+
         if ($model->load(Yii::$app->request->post())) {
             $oldIDsCont = ArrayHelper::map($modelcontacts, 'id', 'id');
             $modelcontacts = BaseModel::createMultiple(EntrCont::classname(), $modelcontacts);
