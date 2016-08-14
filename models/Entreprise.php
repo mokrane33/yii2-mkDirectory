@@ -156,6 +156,8 @@ class Entreprise extends Image
             $entcont->delete();
         foreach($this->getEntrAnnexes()->all() as $annex)
             $annex->delete();
+        foreach($this->getEntrProduits()->all() as $annex)
+            $annex->delete();
 
         return parent::beforeDelete();
     }
