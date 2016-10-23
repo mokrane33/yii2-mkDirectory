@@ -2,7 +2,11 @@
 
 namespace app\modules\lyxeocat\models;
 
+use app\models\EntrCont;
+use app\models\Entreprise;
 use Yii;
+use yii\behaviors\SluggableBehavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "category".
@@ -17,7 +21,6 @@ use Yii;
  * @property string $meta_key
  * @property string $meta_description
  *
- * @property Tourisme[] $tourismes
  */
 class Category extends Cat
 {
@@ -30,6 +33,18 @@ class Category extends Cat
     public static function tableName()
     {
         return '{{%category}}';
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => SluggableBehavior::className(),
+                'attribute' => 'name',
+                'immutable' => true,
+                'ensureUnique'=>true,
+            ],
+        ];
     }
 
     /**
@@ -62,7 +77,47 @@ class Category extends Cat
             'meta_description' => Yii::t('app', 'Meta Description'),
         ];
     }
+    public function getCountAllEntre($status=3)
+    {
+        $entreprise=$this->getEntreprise();
+        if($status==0)
+            $entreprise->andWhere(['status'=>0]);
+        if($status==1)
+            $entreprise->andWhere(['status'=>1]);
 
+       $a= $entreprise->count();
+
+        if($children=$this->getChildren()->all())
+        {
+           foreach($children as $child)
+           {
+               $a+=$child->getCountAllEntre($status);
+           }
+        }
+
+        return $a;
+    }
+
+    public function getAllEntreIds($status=3)
+    {
+        $entreprise=$this->getEntreprise();
+        if($status==0)
+            $entreprise->andWhere(['status'=>0]);
+        if($status==1)
+            $entreprise->andWhere(['status'=>1]);
+
+        $a= ArrayHelper::map( $entreprise->all(),'id','id'); // $entreprise->all();
+
+        if($children=$this->getChildren()->all())
+        {
+            foreach($children as $child)
+            {
+                $a+=$child->getAllEntreIds($status=3);
+            }
+        }
+
+        return $a;
+    }
 
     public function getUniqueName($origin=null)
     {
@@ -114,10 +169,13 @@ class Category extends Cat
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTourismes()
+    public function getEntreprise()
     {
-        return $this->hasMany(Tourisme::className(), ['id_cat' => 'id']);
+        return $this->hasMany(Entreprise::className(), ['id' => 'id_ent'])
+            ->viaTable('entr_cat', ['id_cat' => 'id']);
     }
+
+
 
     /**
      * @inheritdoc

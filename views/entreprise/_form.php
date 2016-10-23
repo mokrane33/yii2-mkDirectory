@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Entreprise */
 /* @var $form yii\widgets\ActiveForm */
+$ressource= new \app\resources\Resources();
 ?>
 
 <div class="entreprise-form">
@@ -26,14 +27,17 @@ use yii\widgets\ActiveForm;
             'id' => 'dynamic-form'
         ]
     ]);
-//    var_dump((new Category())->getTree());
+    $cattree=(new Category())->getTree();
    $catlist=ArrayHelper::map((new Category())->getTree(),'id','name');
 //    (new Category())->gettreeArray();
 // $catlist=['aa'=>[1=>'111',2=>'2222']];
-//    var_dump( $catlist);
+    $catlist= Category::gettreeArraySelect($cattree,[],'-');
     ?>
+    <?= $form->field($model, 'form_jurid')->dropDownList($ressource->form_jurid) ?>
 
     <?= $form->field($model, 'raisonsociale')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'createdyear')->textInput() ?>
 
 <?= $form->field($model,'entreprise_cat_array')->widget(Select2::classname(), [
     'data' => $catlist,
@@ -46,9 +50,15 @@ use yii\widgets\ActiveForm;
 <!--    --><?php //echo $this->render('/entr-cat/_form',['modelCats'=>$modelCats, 'form'=>$form]); ?>
 
     <?php echo $this->render('/entr-adresse/_form',['model'=>$modelAdress,'form'=>$form]); ?>
-    <?=   $form->field($model, 'status')->widget(SwitchInput::classname(), [
-        'type' => SwitchInput::CHECKBOX
-    ]);
+
+    <?php if(\Yii::$app->user->identity->isAdmin):
+    ?>
+
+        <?=   $form->field($model, 'status')->widget(SwitchInput::classname(), [
+            'type' => SwitchInput::CHECKBOX
+        ]);
+        ?>
+    <?php endif;
     ?>
 
     <?php

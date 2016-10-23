@@ -13,7 +13,7 @@ class m160405_040110_entreprise_create extends Migration
                 'created'=>Schema::TYPE_DATE,
                 'modified'=>Schema::TYPE_DATE,
                 'status'=>Schema::TYPE_BOOLEAN,
-                'logo'=>Schema::TYPE_STRING,
+                'image'=>Schema::TYPE_STRING,
                 'raisonsociale'=>Schema::TYPE_STRING,
                 'description_small'=>Schema::TYPE_TEXT,
                 'description_big'=>Schema::TYPE_TEXT,

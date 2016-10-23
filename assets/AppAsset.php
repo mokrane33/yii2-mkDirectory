@@ -19,12 +19,16 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
+        'css/green.css',
     ];
     public $js = [
+        'js/markerclusterer.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
+//        'yii\bootstrap\BootstrapAsset',
         '\rmrevin\yii\fontawesome\AssetBundle',
+        'romdim\bootstrap\material\BootMaterialCssAsset',
+        'romdim\bootstrap\material\BootMaterialJsAsset'
     ];
 }

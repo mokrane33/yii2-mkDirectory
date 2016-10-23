@@ -18,8 +18,8 @@ class EntrepriseSearch extends Entreprise
     public function rules()
     {
         return [
-            [['id', 'status'], 'integer'],
-            [['created', 'modified', 'raisonsociale', 'description_small', 'description_big'], 'safe'],
+            [['id', 'status','form_jurid'], 'integer'],
+            [['created', 'modified', 'raisonsociale', 'description_small', 'description_big','createdyear'], 'safe'],
         ];
     }
 
@@ -63,6 +63,8 @@ class EntrepriseSearch extends Entreprise
             'created' => $this->created,
             'modified' => $this->modified,
             'status' => $this->status,
+            'createdyear' => $this->createdyear,
+            'form_jurid' => $this->form_jurid,
         ]);
 
         $query->andFilterWhere(['like', 'raisonsociale', $this->raisonsociale])

@@ -6,11 +6,14 @@ use app\models\BaseModel;
 use app\models\EntrAdresse;
 use app\models\EntrCat;
 use app\models\EntrCont;
+use app\modules\lyxeocat\models\Category;
+use app\modules\lyxeoville\models\Ville;
 use kartik\widgets\ActiveForm;
 use Yii;
 use app\models\Entreprise;
 use app\models\EntrepriseSearch;
 use yii\base\Model;
+use yii\data\ActiveDataProvider;
 use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -31,20 +34,7 @@ class EntrepriseController extends BaseController
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'actions' => ['login', 'error','index','view'],
-                        'allow' => true,
-                    ],
-                    [
-                        'actions' => ['logout', 'admin' ,'create' ,'delete' ,'update'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
+
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -61,7 +51,9 @@ class EntrepriseController extends BaseController
     public function actionIndex()
     {
         $searchModel = new EntrepriseSearch();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere(['status'=>1])->orderBy(['created'=>'DESC']);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -73,10 +65,14 @@ class EntrepriseController extends BaseController
      */
     public function actionAdmin()
     {
+        if(!Yii::$app->user->can('entreprise-admin')){
+            return $this->permissionRedirect();
+        }
         $searchModel = new EntrepriseSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
+        if(!Yii::$app->user->identity->isAdmin)
+            $dataProvider->query->andWhere('user_id ='.Yii::$app->user->id);
+        return $this->render('admin', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -84,14 +80,79 @@ class EntrepriseController extends BaseController
 
     /**
      * Displays a single Entreprise model.
-     * @param integer $id
+     * @param string $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($slug)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModelslug($slug),
         ]);
+    }
+
+    public function actionCategory($slug=null)
+    {
+        if($slug)
+        {
+            /** @var Category $model */
+            $model=$this->findCatModelslug($slug);
+            $entrepri=new ActiveDataProvider([
+                'query' => Entreprise::find()->where(['id'=> $model-> getAllEntreIds(1)])->orderBy(['raisonsociale'=>'ASC']),
+            ]);
+
+            if($children=$model->getChildren())
+//                return $this->render('/module/_cat-list', [
+//                    'modelcat' => $model,
+//                    'catmodels'=>$children->all()
+//                ]);
+                return $this->render('list_entre_by_cat', [
+                    'modelcat' => $model,
+                    'entreprises'=>$entrepri
+                ]);
+            else
+                return $this->render('list_entre_by_cat', [
+                    'modelcat' => $model,
+                    'entreprises'=>$entrepri
+                ]);
+
+        }
+        else{
+            $models=Category::find()->orderBy(['name'=>'ASC'])->all();
+            $title='Liste Categories';
+            $this->render('category-list',['model-cat'=>null,'catmodels'=>$models]);
+        }
+    }
+    public function actionVille($slug=null)
+    {
+        if($slug)
+        {
+            /** @var Category $model */
+            $model=$this->findVilleModelslug($slug);
+            $entrepri=new ActiveDataProvider([
+                'query' => Entreprise::find()->where(['id'=> $model-> getAllEntreIds(3)])->orderBy(['raisonsociale'=>'ASC']),
+            ]);
+
+            if($children=$model->getChildren())
+//                return $this->render('/module/_cat-list', [
+//                    'modelcat' => $model,
+//                    'catmodels'=>$children->all()
+//                ]);
+                return $this->render('list_entre_by_cat', [
+                    'model-cat' => $model,
+                    'entreprises'=>$entrepri
+                ]);
+            else
+                return $this->render('list_entre_by_cat', [
+                    'model-cat' => $model,
+                    'entreprises'=>$entrepri
+                ]);
+
+        }
+        else{
+            $models=Category::find()->orderBy(['name'=>'ASC'])->all();
+            $title='Liste Ville';
+            $this->render('category-list',['model-cat'=>null,'catmodels'=>$models]);
+        }
     }
 
     /**
@@ -101,11 +162,17 @@ class EntrepriseController extends BaseController
      */
     public function actionCreate()
     {
+        if(!Yii::$app->user->can('entreprise-create')){
+            return $this->permissionRedirect();
+        }
+
         $model = new Entreprise();
         $model->status=0;
         $modelcontacts=[new EntrCont()];
         $modelAdress=new EntrAdresse();
         $modelCats=[new EntrCat()];
+        if(!Yii::$app->user->identity->isAdmin)
+            $model->user_id=Yii::$app->user->id;
 
         if ($model->load(Yii::$app->request->post())) {
             $model->created=date("Y-m-d");
@@ -205,11 +272,18 @@ class EntrepriseController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $model])){
+            return $this->permissionRedirect();
+        }
+        $user_id=$model->user_id;
+
         $modelcontacts=$model->getEntrCont()->all();
         $modelAdress=$model->getEntrAdresse()->one();
 //var_dump($modelAdress);exit;
 
         if ($model->load(Yii::$app->request->post())) {
+            if(!Yii::$app->user->identity->isAdmin)
+                $model->user_id=$user_id;
             $model->modified=date("Y-m-d");
             $oldIDsCont = ArrayHelper::map($modelcontacts, 'id', 'id');
             $modelcontacts = BaseModel::createMultiple(EntrCont::classname(), $modelcontacts);
@@ -284,7 +358,11 @@ class EntrepriseController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model= $this->findModel($id);
+        if(!Yii::$app->user->can('entreprise-delete', ['entreprise' => $model])){
+            return $this->permissionRedirect();
+        }
+        $model->delete();
 
         return $this->redirect(['index']);
     }
@@ -299,6 +377,31 @@ class EntrepriseController extends BaseController
     protected function findModel($id)
     {
         if (($model = Entreprise::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+    protected function findModelslug($id)
+    {
+        if (($model = Entreprise::findOne(['slug' => $id])) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+    protected function findCatModelslug($id)
+    {
+        if (($model = Category::findOne(['slug' => $id])) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+    protected function findVilleModelslug($id)
+    {
+        if (($model = Ville::findOne(['slug' => $id])) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -149,7 +149,7 @@ class DefaultController extends Controller
             $parents = $_POST['depdrop_parents'];
             if ($parents != null) {
                 $cat_id = $parents[0];
-                $out =(new Category())->getChildren($cat_id);
+                $out =(new Category())->getChildren($cat_id)->all();
                 // the getSubCatList function will query the database based on the
                 // cat_id and return an array like below:
                 // [

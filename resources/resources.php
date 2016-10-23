@@ -16,6 +16,10 @@ class Resources
         '2' => 'VALIDE',
         '3' => 'CLOSE',
         ];
+
+    public $form_jurid=[
+        '1'=>'SARL',
+    ];
     public function getStatus()
     {
         return $this->type;

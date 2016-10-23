@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use app\modules\lyxeoville\models\Ville;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "{{%entr_adresse}}".
@@ -58,6 +59,59 @@ class EntrAdresse extends \yii\db\ActiveRecord
     public function getVille()
     {
         return $this->hasOne(Ville::className(), ['id' => 'ville']);
+    }
+
+    public function AddToMap($contacts = null, $entreprise = null)
+    {
+        $contentString= '<div id="content">' .
+            '<div id="siteNotice">' .
+            ' <h1>' . $entreprise . '</h1>' .
+            '</div>' ;
+        if ($contacts):
+            /** @var Ville $ville */
+            $ville = $this->getVille()->one();
+            $adville = $ville->name;
+            if ($a = $ville->getparent())
+                $adville .= ', ' . $a->name;
+            $contentString =
+                '<h3 id="firstHeading" class="firstHeading">' . $this->adresss . ' ' . $adville . '</h3><div id="bodyContent">';
+            /** @var EntrCont $contact */
+            $typecontact = New TypeContact();
+            foreach ($contacts as $contact) {
+                $contentString .= $typecontact->getFontAwesome($contact->type) . ' ' . $contact->valeur . '<br/>';
+            }
+            $contentString .= '</div>';
+
+
+        endif;
+        $contentString .= '</div>';
+
+        $aa = "var infowindow = new google.maps.InfoWindow({
+            content: '" . $contentString . "'
+                });";
+        $app = $aa;
+        $lat = $this->latitude;
+        $lon = $this->longitude;
+        $app .= 'var markers=[];';
+
+//        for(var i=0;i<10;i=i+1){
+        $app .= " var lat=" . $lat . ";";
+        $app .= " var lon=" . $lon . ";
+        var marker = new google.maps.Marker({
+
+                        position : {lat: lat, lng: lon },
+
+                        //draggable: true,
+                        animation: google.maps.Animation.DROP,
+                    });
+                     marker.addListener('click', function() {
+                     infowindow.open(map, marker);
+  });
+  markers.push(marker);";
+//        lat=lat+0.1;}
+
+        $app .= "var markerCluster = new MarkerClusterer(map, markers,{imagePath: '" . Url::base() . "/images/maps/m'});";
+        return $app;
     }
 
 

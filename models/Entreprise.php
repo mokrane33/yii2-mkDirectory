@@ -18,6 +18,11 @@ use yii\helpers\ArrayHelper;
  * @property string $raisonsociale
  * @property string $description_small
  * @property string $description_big
+ * @property integer $user_id
+ * @property string $slug
+ * @property string $createdyear
+ * @property integer $form_jurid
+ * @property string $defaultlogo
  *
  * @property EntrAnnex[] $entrAnnexes
  * @property EntrCat[] $entrCats
@@ -29,6 +34,7 @@ class Entreprise extends Image
      * @inheritdoc
      */
     public $imagefile;
+    public $defaultlogo='images/logo.png';
    public $image_path='images/entrepriselogo/';
     public $entreprise_cat_array=[];
     public static function tableName()
@@ -54,11 +60,13 @@ class Entreprise extends Image
     {
         return [
             [['created', 'modified'], 'safe'],
-            [['status'], 'integer'],
+            [['status','user_id','form_jurid'], 'integer'],
             [['description_small', 'description_big'], 'string'],
-            [[ 'image','raisonsociale'], 'string', 'max' => 255],
+            [[ 'image','raisonsociale','createdyear'], 'string', 'max' => 255],
             [['entreprise_cat_array'], 'each', 'rule' => ['integer']],
             [[ 'raisonsociale'], 'required'],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+
         ];
     }
 
@@ -77,6 +85,8 @@ class Entreprise extends Image
             'raisonsociale' => Yii::t('app', 'Raisonsociale'),
             'description_small' => Yii::t('app', 'Description Small'),
             'description_big' => Yii::t('app', 'Description Big'),
+            'createdyear' => Yii::t('app', 'Annee creation'),
+            'form_jurid' => Yii::t('app', 'Forme Juridique'),
         ];
     }
 
@@ -119,7 +129,7 @@ class Entreprise extends Image
      */
     public function getEntrCont()
     {
-        return $this->hasMany(EntrCont::className(), ['id_ent' => 'id'])->andFilterWhere(['type_ent'=>0]);
+        return $this->hasMany(EntrCont::className(), ['id_ent' => 'id'])->andFilterWhere(['type_ent'=>0])->orderBy('type');
     }
     /**
      * @return \yii\db\ActiveQuery
@@ -128,6 +138,12 @@ class Entreprise extends Image
     {
         return $this->hasMany(EntrAdresse::className(), ['id_ent' => 'id'])->andFilterWhere(['type_ent'=>0]);
     }
+
+    public function getEntrAdresseSec()
+    {
+        return $this->hasMany(EntrAdresse::className(), ['id_ent' => 'id'])->andFilterWhere(['type_ent'=>1])->viaTable('entr_annex', ['id_ent' => 'id']);
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
@@ -146,6 +162,13 @@ class Entreprise extends Image
         return $this->hasMany(EntrProduit::className(), ['id_ent' => 'id']);
     }
 
+    public function getLogo()
+    {
+        if($this->getImageurl())
+            return $this->getImageurl();
+        else
+            return Yii::getAlias('@web').'/'.$this->defaultlogo;
+    }
 
     public function beforedelete()
     {
@@ -161,4 +184,14 @@ class Entreprise extends Image
 
         return parent::beforeDelete();
     }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
 }

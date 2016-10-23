@@ -30,6 +30,15 @@ class DefaultController extends Controller
             ],
         ];
     }
+//
+//    public function actionAa()
+//    {
+//        $viles=Ville::find()->all();
+//        foreach($viles as $ville)
+//        {
+//            $ville->save();
+//        }
+//    }
 
 
     public function actionGetlist()
@@ -62,7 +71,8 @@ class DefaultController extends Controller
     {
         $searchModel = new VilleSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+//        if(isset($_GET['id_parent']))
+//        $dataProvider->query->andWhere(['id_parent'=>0]);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -91,8 +101,7 @@ class DefaultController extends Controller
         $model = new Ville();
 
         if ($model->load(Yii::$app->request->post()) ) {
-
-
+            
             if($parentmodel=Ville::findOne($model->id_parent))
             {
                 //var_dump($parentmodel);exit;

@@ -20,7 +20,7 @@ use yii\web\Response;
 /**
  * EntrAnnexController implements the CRUD actions for EntrAnnex model.
  */
-class EntrAnnexController extends Controller
+class EntrAnnexController extends BaseController
 {
     /**
      * @inheritdoc
@@ -48,6 +48,9 @@ class EntrAnnexController extends Controller
            return $this->redirect(['/entreprise']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
             return $this->redirect(['/entreprise']);
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $modelentreprise])){
+            return $this->permissionRedirect();
+        }
         $params['EntrAnnexSearch']['id_ent']=$params['id_ent'];
         $searchModel = new EntrAnnexSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -59,6 +62,24 @@ class EntrAnnexController extends Controller
         ]);
     }
 
+//    public function actionAdmin()
+//    {
+//        $params= Yii::$app->request->queryParams;
+//        if(!array_key_exists('id_ent',$params))
+//           return $this->redirect(['/entreprise/admin']);
+//        if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
+//            return $this->redirect(['/entreprise/admin']);
+//        $params['EntrAnnexSearch']['id_ent']=$params['id_ent'];
+//        $searchModel = new EntrAnnexSearch();
+//        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+////        $dataProvider->query->andWhere('')
+//        return $this->render('index', [
+//            'modelentreprise'=>$modelentreprise,
+//            'searchModel' => $searchModel,
+//            'dataProvider' => $dataProvider,
+//        ]);
+//    }
+
     /**
      * Displays a single EntrAnnex model.
      * @param integer $id
@@ -68,9 +89,9 @@ class EntrAnnexController extends Controller
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -85,9 +106,12 @@ class EntrAnnexController extends Controller
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $modelentreprise])){
+            return $this->permissionRedirect();
+        }
         $model = new EntrAnnex();
         $modelcontacts=[new EntrCont()];
         $modelAdress=new EntrAdresse();
@@ -181,9 +205,13 @@ class EntrAnnexController extends Controller
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
+
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $modelentreprise])){
+            return $this->permissionRedirect();
+        }
         $model = $this->findModel($id);
         $modelcontacts=$model->getEntrCont()->all();
         $modelAdress=$model->getEntrAdresse()->one();
@@ -263,9 +291,12 @@ class EntrAnnexController extends Controller
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $modelentreprise])){
+            return $this->permissionRedirect();
+        }
 
         if (($model = EntrAnnex::find()->where('id='.$id.' and id_ent='.$params['id_ent'])->one()) !== null) {
              $model->delete();

@@ -3,7 +3,9 @@
 $params = require(__DIR__ . '/params.php');
 
 $config = [
-    'id' => 'basic',
+    'id' => 'annuaire-sts-lyxeo-algerie',
+    'defaultRoute'=>'entreprise/index',
+
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'as access' => [
@@ -16,10 +18,6 @@ $config = [
             'entreprise/*',
             'ville/*',
             'category/*',
-//            'client/*',
-//            'custom-service/*',
-//            'partnerData/*',
-//            'partner-data/*',
             '*',
         ]
     ],
@@ -37,10 +35,6 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-//        'user' => [
-//            'identityClass' => 'app\models\User',
-//            'enableAutoLogin' => true,
-//        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
@@ -65,8 +59,15 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'suffix' => '.html',
             'rules' => [
-            ],
+                'entreprise-detail/<slug>' => 'entreprise/view',
+                'entreprise-categorie/<slug>' => 'entreprise/category',
+                'entreprise-ville/<slug>' => 'entreprise/ville',
+                '<controller>/<action:\w+>' => '<controller>/<action>',
+//                '<module>/<action:\w+>' => '<module>/default/<action>',
+                '<module:category>-detail' => '<module>/default/voire',
+            ]
         ],
        // */
     ],
@@ -102,9 +103,12 @@ $config = [
         ],
         'category' => [
             'class' => 'app\modules\lyxeocat\Category',
+            'controllerMap'=>['default'=>'app\controllers\CategoryController']
+
         ],
         'ville' => [
             'class' => 'app\modules\lyxeoville\Ville',
+            'controllerMap'=>['default'=>'app\controllers\VilleController']
         ],
     ],
     'params' => $params,

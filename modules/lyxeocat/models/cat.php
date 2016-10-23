@@ -70,9 +70,33 @@ class Cat extends \yii\db\ActiveRecord
 
     }
 
+    public static function gettreeArraySelect($models,$array=[],$sep='')
+    {
+
+
+        // var_dump($models);echo'1111';
+        // exit;
+        if($models)
+            foreach($models as $model)
+            {
+                //var_dump($model,'22222');
+
+                //var_dump($model->child,'child');
+                if(isset($model->child))
+                    $array[$model->name] =Cat::gettreeArray($model->child,[],'--');
+                else
+                    $array[$model->id]=$model->name;
+
+
+            }
+
+        return $array;
+
+    }
+
      public function afterSave($insert, $changedAttributes)
     {
-       $children= $this->getChildren();
+       $children= $this->getChildren()->all();
         /*ini_set('xdebug.var_display_max_depth', 5);
         ini_set('xdebug.var_display_max_children', 256);
         ini_set('xdebug.var_display_max_data', 1024);
@@ -95,9 +119,9 @@ class Cat extends \yii\db\ActiveRecord
     public function getChildren($id=null)
     {
         if($id==null)
-        return $this->find()->andFilterWhere(['id_parent'=>$this->id])->orderBy('name')->all();
+            return $this->find()->andFilterWhere(['id_parent'=>$this->id])->orderBy('name');
         else
-            return $this->find()->andFilterWhere(['id_parent'=>$id])->orderBy('name')->all();
+            return $this->find()->andFilterWhere(['id_parent'=>$id])->orderBy('name');
     }
 
 }

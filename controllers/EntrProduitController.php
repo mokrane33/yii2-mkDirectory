@@ -20,7 +20,7 @@ use yii\web\UploadedFile;
 /**
  * EntrProduitController implements the CRUD actions for EntrProduit model.
  */
-class EntrProduitController extends Controller
+class EntrProduitController extends BaseController
 {
     /**
      * @inheritdoc
@@ -41,13 +41,34 @@ class EntrProduitController extends Controller
      * Lists all EntrProduit models.
      * @return mixed
      */
+//    public function actionAdmin()
+//    {
+//        $params= Yii::$app->request->queryParams;
+//        if(!array_key_exists('id_ent',$params))
+//            return $this->redirect(['/entreprise']);
+//        if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
+//            return $this->redirect(['/entreprise']);
+//        $params['EntrProduitSearch']['id_ent']=$params['id_ent'];
+//        $searchModel = new EntrProduitSearch();
+//        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+//
+//        return $this->render('index', [
+//            'modelentreprise'=>$modelentreprise,
+//            'searchModel' => $searchModel,
+//            'dataProvider' => $dataProvider,
+//        ]);
+//    }
+
     public function actionIndex()
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $modelentreprise])){
+            return $this->permissionRedirect();
+        }
         $params['EntrProduitSearch']['id_ent']=$params['id_ent'];
         $searchModel = new EntrProduitSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -68,9 +89,10 @@ class EntrProduitController extends Controller
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
+
         return $this->render('view', [
             'modelentreprise'=>$modelentreprise,
             'model' => $this->findModel($id),
@@ -86,9 +108,12 @@ class EntrProduitController extends Controller
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $modelentreprise])){
+            return $this->permissionRedirect();
+        }
 
         $model = new EntrProduit();
         $produitImages=[new EntrProduitImage()];
@@ -177,9 +202,12 @@ class EntrProduitController extends Controller
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $modelentreprise])){
+            return $this->permissionRedirect();
+        }
 
         $model = $this->findModel($id);
 
@@ -269,9 +297,12 @@ class EntrProduitController extends Controller
     {
         $params= Yii::$app->request->queryParams;
         if(!array_key_exists('id_ent',$params))
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
         if(!$modelentreprise=Entreprise::find()->where(['id'=>$params['id_ent']])->one())
-            return $this->redirect(['/entreprise']);
+            return $this->redirect(['/entreprise/admin']);
+        if(!Yii::$app->user->can('entreprise-update' , ['entreprise' => $modelentreprise])){
+            return $this->permissionRedirect();
+        }
 
         if (($model = EntrProduit::find()->where('id='.$id.' and id_ent='.$params['id_ent'])->one()) !== null) {
             $model->delete();
